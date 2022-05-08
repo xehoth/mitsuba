@@ -50,3 +50,5 @@ mitsuba.*.log
 .project
 build/.compile_commands.json
 build/compile_commands.json
+.vscode
+build/.cache
