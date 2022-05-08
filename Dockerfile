@@ -5,7 +5,7 @@ ENV TZ=Asia/Shanghai
 WORKDIR /home/mitsuba
 COPY . /home/mitsuba
 
-RUN apt update -y && apt upgrade -y && apt install -y build-essential apt-utils python3 python3-pip libpng-dev libjpeg-dev libilmbase-dev libxerces-c-dev libboost-all-dev libopenexr-dev libglewmx-dev libxxf86vm-dev libpcrecpp0v5 libeigen3-dev libfftw3-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev git vim curl qt5-default libqt5xmlpatterns5-dev \
+RUN apt update -y && apt upgrade -y && apt install -y build-essential apt-utils python3 python3-pip scons libpng-dev libjpeg-dev libilmbase-dev libxerces-c-dev libboost-all-dev libopenexr-dev libglewmx-dev libxxf86vm-dev libpcrecpp0v5 libeigen3-dev libfftw3-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev git vim curl qt5-default libqt5xmlpatterns5-dev \
     && ln -s /usr/lib/x86_64-linux-gnu/pkgconfig/Qt5Concurrent.pc /usr/lib/x86_64-linux-gnu/pkgconfig/QtConcurrent.pc \
     && ln -s /usr/lib/x86_64-linux-gnu/pkgconfig/Qt5Core.pc /usr/lib/x86_64-linux-gnu/pkgconfig/QtCore.pc \
     && ln -s /usr/lib/x86_64-linux-gnu/pkgconfig/Qt5Gui.pc /usr/lib/x86_64-linux-gnu/pkgconfig/QtGui.pc \
@@ -19,8 +19,7 @@ RUN apt update -y && apt upgrade -y && apt install -y build-essential apt-utils 
     && ln -s /usr/lib/x86_64-linux-gnu/pkgconfig/Qt5Xml.pc /usr/lib/x86_64-linux-gnu/pkgconfig/QtXml.pc \
     && ln -s /usr/lib/x86_64-linux-gnu/pkgconfig/Qt5XmlPatterns.pc /usr/lib/x86_64-linux-gnu/pkgconfig/QtXmlPatterns.pc \
     && cd /home/ \
-    && pip install SCons \
-    && pip install scons-compiledb \
+    && pip install scons-compiledb conan \
     && cd /home/mitsuba \
     && cp build/config-linux-gcc.py config.py
     && echo 'source /home/mitsuba/setpath.sh' >> ~/.bashrc \
