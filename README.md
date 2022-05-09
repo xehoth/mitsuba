@@ -9,6 +9,7 @@ Modified version of mitsuba renderer target for learning rendering.
 - Add support for package manager [conan](https://conan.io/)
 - Fix compilation with C++ 17
 - Fix overflow in render setting UI (only happens in release mode)
+- OpenEXR has been change to 2.5.5 with conan.
 
 ## New Plugins
 
