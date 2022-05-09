@@ -5,5 +5,6 @@ plugins += env.SharedLibrary('gridvolume', ['gridvolume.cpp'])
 plugins += env.SharedLibrary('hgridvolume', ['hgridvolume.cpp'])
 plugins += env.SharedLibrary('volcache', ['volcache.cpp'])
 plugins += env.SharedLibrary('openvdbvolume', ['openvdbvolume.cpp'])
+plugins += env.SharedLibrary('nanovdbvolume', ['nanovdbvolume.cpp'])
 
 Export('plugins')
