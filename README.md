@@ -14,7 +14,7 @@ Modified version of mitsuba renderer target for learning rendering.
 ## New Plugins
 
 - [openvdbvolume](#openvdbvolume): openvdb volume data source
-- [ratiotracking](#ratiotracking): heterogeneous transmittance estimation method
+- [ratiotracking](#ratiotracking): transmittance estimation for heterogeneous medium
 
 May implement some recent papers.
 
