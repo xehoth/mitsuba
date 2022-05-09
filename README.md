@@ -1,5 +1,26 @@
-Mitsuba — Physically Based Renderer
-===================================
+# Modified version of mitsuba
+
+Modified version of mitsuba renderer target for learning rendering.
+
+## Changes
+
+- Use python3 and scons3 for compiling.
+- Generate compile commands with [scons-compiledb](https://pypi.org/project/scons-compiledb/). Thus we can use clangd for intellisense.
+- Add support for package manager [conan](https://conan.io/)
+- Fix compilation with C++ 17
+- Fix overflow in render setting UI (only happens in release mode)
+
+## New Plugins
+
+- `openvdbvolume`: `volume/openvdbvolume.cpp`, openvdb volume data source (WIP, unverified)
+
+May implement some recent papers.
+
+## Dockerfile
+
+Quickly build with docker. And the compile process can refer to this.
+
+# Mitsuba — Physically Based Renderer
 
 http://mitsuba-renderer.org/
 
