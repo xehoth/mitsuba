@@ -14,6 +14,7 @@ Modified version of mitsuba renderer target for learning rendering.
 ## New Plugins
 
 - [openvdbvolume](#openvdbvolume): openvdb volume data source
+- [nanovdbvolume](#nanovdbvolume): nanovdb volume data source
 - [ratiotracking](#ratiotracking): transmittance estimation for heterogeneous medium
 
 May implement some recent papers.
@@ -28,6 +29,24 @@ Implemented in file `volume/openvdbvolume.cpp`.
 Example:
 ```xml
 <volume name="density" type="openvdbvolume">
+  <string name="filename" value="bunny_cloud.vdb"/>
+  <transform name="toWorld">
+    <scale value="0.05"/>
+    <translate y="-1"/>
+  </transform>
+</volume>
+```
+
+### nanovdbvolume
+
+Implemented in file `volume/nanovdbvolume.cpp`.  
+- `filename`: the file path of the openvdb file
+- `gridname`: explicitly use the given grid in the vdb, if not given, use the first one
+- `customStepSize`: default set to half of the voxel size
+
+Example:
+```xml
+<volume name="density" type="nanovdbvolume">
   <string name="filename" value="bunny_cloud.vdb"/>
   <transform name="toWorld">
     <scale value="0.05"/>
