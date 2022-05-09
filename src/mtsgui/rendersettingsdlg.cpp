@@ -61,8 +61,10 @@ public:
     }
 
     QString textFromValue(double value) const {
-        char tmp[32];
-        snprintf(tmp, sizeof(tmp), "%f", value);
+        std::string s = std::to_string(value);
+        s += '\0';
+        s.resize(s.size() * 2, '\0');
+        char *tmp = s.data();
         morphNumericString(tmp);
         return QString::fromLatin1(tmp);
     }
