@@ -132,7 +132,6 @@ class OpenvdbDataSource : public VolumeDataSource {
   std::string m_filename;
   std::string m_gridname;
   openvdb::FloatGrid::Ptr m_grid{};
-  openvdb::math::AffineMap trans;
   Float m_customStepSize = 0;
   Transform m_volumeToWorld;
   Transform m_worldToVolume;
