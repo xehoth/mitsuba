@@ -1,4 +1,5 @@
 # Modified version of mitsuba
+[![CI](https://github.com/xehoth/mitsuba/actions/workflows/docker-image.yml/badge.svg)](https://github.com/xehoth/mitsuba/actions/workflows/docker-image.yml)
 
 Modified version of mitsuba renderer target for learning rendering.
 
