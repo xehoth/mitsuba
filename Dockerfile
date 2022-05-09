@@ -22,8 +22,9 @@ RUN apt update -y && apt upgrade -y && apt install -y build-essential apt-utils 
     && pip install scons-compiledb conan \
     && conan profile new default --detect \
     && conan profile update settings.compiler.libcxx=libstdc++11 default \
+    && apt clean \
     && cd /home/mitsuba \
-    && cp build/config-linux-gcc.py config.py
+    && cp build/config-linux-gcc.py config.py \
     && echo 'source /home/mitsuba/setpath.sh' >> ~/.bashrc \
     && scons -j 8
 
