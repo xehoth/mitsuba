@@ -60,31 +60,12 @@ class OpenvdbDataSource : public VolumeDataSource {
   }
 
   void configure() override {
-    const auto &mat = m_volumeToWorld.getMatrix();
-    openvdb::math::Mat4d g_mat;
-    for (int i = 0; i < 4; ++i)
-      for (int j = 0; j < 4; ++j) g_mat(i, j) = mat(i, j);
-    m_grid->transform().postMult(g_mat);
-    m_grid->transform().postScale(5.0);
+    updateTransform();
+    calculateBoundingBox();
     Float min_value, max_value;
     m_grid->evalMinMax(min_value, max_value);
     m_maximumFloatValue = max_value;
     Log(EDebug, "maximum float value: %f", m_maximumFloatValue);
-
-    openvdb::CoordBBox local_bounding_box =
-        m_grid->evalActiveVoxelBoundingBox();
-    openvdb::BBoxd bounding_box =
-        m_grid->transform().indexToWorld(local_bounding_box);
-    auto b_min = bounding_box.min();
-    auto b_max = bounding_box.max();
-    Log(EDebug, "world bounding box: (%f, %f, %f) x (%f, %f, %f)", b_min.x(),
-        b_min.y(), b_min.z(), b_max.x(), b_max.y(), b_max.z());
-    Point p_min(b_min.x(), b_min.y(), b_min.z());
-    Point p_max(b_max.x(), b_max.y(), b_max.z());
-    m_aabb = AABB(p_min, p_max);
-
-    Log(EDebug, "world bounding box: (%f, %f, %f) x (%f, %f, %f)", p_min.x,
-        p_min.y, p_min.z, p_max.x, p_max.y, p_max.z);
 
     if (m_customStepSize == 0) {
       const openvdb::math::Vec3d &voxelSize =
@@ -96,8 +77,9 @@ class OpenvdbDataSource : public VolumeDataSource {
   }
 
   Float lookupFloat(const Point &p) const override {
-    openvdb::math::Vec3d gp(p.x, p.y, p.z);
-    gp = m_grid->transform().worldToIndex(gp);
+    Point local = m_worldToVolume(p);
+    openvdb::math::Vec3d gp(local.x, local.y, local.z);
+    // gp = m_grid->transform().worldToIndex(gp);
     // Log(EDebug, "%f %f %f", gp.x(), gp.y(), gp.z());
     openvdb::tools::GridSampler<openvdb::FloatGrid::ConstAccessor,
                                 openvdb::tools::BoxSampler>
@@ -112,12 +94,48 @@ class OpenvdbDataSource : public VolumeDataSource {
   MTS_DECLARE_CLASS()
 
  private:
+  void updateTransform() {
+    Matrix4x4 mat;
+    openvdb::math::Mat4d g_mat =
+        m_grid->transform().baseMap()->getAffineMap()->getMat4();
+    for (int i = 0; i < 4; ++i)
+      for (int j = 0; j < 4; ++j) mat(i, j) = g_mat(i, j);
+
+    m_grid->setTransform(openvdb::math::Transform::createLinearTransform(
+        openvdb::math::Mat4d::identity()));
+    mat = m_volumeToWorld.getMatrix() * mat;
+    m_volumeToWorld = Transform(mat);
+    m_worldToVolume = m_volumeToWorld.inverse();
+  }
+
+  void calculateBoundingBox() {
+    openvdb::CoordBBox local_bounding_box =
+        m_grid->evalActiveVoxelBoundingBox();
+    openvdb::BBoxd bounding_box =
+        m_grid->transform().indexToWorld(local_bounding_box);
+    auto b_min = bounding_box.min();
+    auto b_max = bounding_box.max();
+    Log(EDebug, "local bounding box: (%f, %f, %f) x (%f, %f, %f)", b_min.x(),
+        b_min.y(), b_min.z(), b_max.x(), b_max.y(), b_max.z());
+    Point p_min(b_min.x(), b_min.y(), b_min.z());
+    Point p_max(b_max.x(), b_max.y(), b_max.z());
+    p_min = m_volumeToWorld(p_min);
+    p_max = m_volumeToWorld(p_max);
+    m_aabb.reset();
+    m_aabb.expandBy(p_min);
+    m_aabb.expandBy(p_max);
+
+    Log(EDebug, "world bounding box: (%f, %f, %f) x (%f, %f, %f)", p_min.x,
+        p_min.y, p_min.z, p_max.x, p_max.y, p_max.z);
+  }
+
   std::string m_filename;
   std::string m_gridname;
   openvdb::FloatGrid::Ptr m_grid{};
   openvdb::math::AffineMap trans;
   Float m_customStepSize = 0;
   Transform m_volumeToWorld;
+  Transform m_worldToVolume;
   Float m_maximumFloatValue;
 };
 
