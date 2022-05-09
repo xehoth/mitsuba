@@ -12,9 +12,27 @@ Modified version of mitsuba renderer target for learning rendering.
 
 ## New Plugins
 
-- `openvdbvolume`: `volume/openvdbvolume.cpp`, openvdb volume data source (WIP, unverified)
+- [openvdbvolume](#openvdbvolume): openvdb volume data source
 
 May implement some recent papers.
+
+### openvdbvolume
+
+Implemented in file `volume/openvdbvolume.cpp`.  
+- `filename`: the file path of the openvdb file
+- `gridname`: explicitly use the given grid in the vdb, if not given, use the first one
+- `customStepSize`: default set to half of the voxel size
+
+Example:
+```xml
+<volume name="density" type="openvdbvolume">
+  <string name="filename" value="bunny_cloud.vdb"/>
+  <transform name="toWorld">
+    <scale value="0.05"/>
+    <translate y="-1"/>
+  </transform>
+</volume>
+```
 
 ## Dockerfile
 
