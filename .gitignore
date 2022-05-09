@@ -55,3 +55,4 @@ build/.cache
 build/conan*
 build/graph_info.json
 build/SConscript_conan
+scenes
