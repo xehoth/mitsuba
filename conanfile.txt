@@ -3,3 +3,8 @@ openvdb/8.0.1
 
 [generators]
 scons
+
+[imports]
+bin, *.dll -> ../dist/ # Copies all dll files from packages bin folder to "dist" folder
+lib, *.dylib* -> ../dist/ # Copies all dylib files from packages lib folder to "dist" folder
+lib, *.so* -> ../dist/ # Copies all so files from packages lib folder to "dist" folder
