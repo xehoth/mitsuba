@@ -13,6 +13,7 @@ Modified version of mitsuba renderer target for learning rendering.
 ## New Plugins
 
 - [openvdbvolume](#openvdbvolume): openvdb volume data source
+- [ratiotracking](#ratiotracking): heterogeneous transmittance estimation method
 
 May implement some recent papers.
 
@@ -32,6 +33,19 @@ Example:
     <translate y="-1"/>
   </transform>
 </volume>
+```
+
+### ratiotracking
+
+Implemented in file `medium/heterogeneous.cpp`.  
+Novák J, Selle A, Jarosz W. Residual ratio tracking for estimating attenuation in participating media[J]. ACM Trans. Graph., 2014, 33(6): 179:1-179:11.  
+See details: [https://cs.dartmouth.edu/wjarosz/publications/novak14residual.html](https://cs.dartmouth.edu/wjarosz/publications/novak14residual.html)
+
+Example:
+```xml
+<medium type="heterogeneous" id="smoke">
+  <string name="method" value="ratiotracking"/>
+</medium>
 ```
 
 ## Dockerfile
