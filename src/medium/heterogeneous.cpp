@@ -194,6 +194,46 @@ class HeterogeneousMedium : public Medium {
      * https://cs.dartmouth.edu/wjarosz/publications/novak14residual.html
      */
     ERatioTracking,
+
+    /**
+     * \brief Use next flight estimator from paper:
+     * Novák J, Georgiev I, Hanika J, et al. Monte Carlo methods for volumetric
+     * light transport simulation[C]//Computer Graphics Forum. 2018, 37(2):
+     * 551-576.
+     * See details:
+     * https://cs.dartmouth.edu/wjarosz/publications/novak18monte.html
+     */
+    ENextFlight,
+
+    /**
+     * \brief Use P-series ratio tracking estimator from paper:
+     * Georgiev I, Misso Z, Hachisuka T, et al. Integral formulations of
+     * volumetric transmittance[J]. ACM Transactions on Graphics (TOG), 2019,
+     * 38(6): 1-17.
+     * See details:
+     * https://cs.dartmouth.edu/wjarosz/publications/georgiev19integral.html
+     */
+    EPSeriesRatio,
+
+    /**
+     * \brief Use P-series cumulative estimator from paper:
+     * Georgiev I, Misso Z, Hachisuka T, et al. Integral formulations of
+     * volumetric transmittance[J]. ACM Transactions on Graphics (TOG), 2019,
+     * 38(6): 1-17.
+     * See details:
+     * https://cs.dartmouth.edu/wjarosz/publications/georgiev19integral.html
+     */
+    EPSeriesCumulative,
+
+    /**
+     * \brief Use P-series CMF estimator from paper:
+     * Georgiev I, Misso Z, Hachisuka T, et al. Integral formulations of
+     * volumetric transmittance[J]. ACM Transactions on Graphics (TOG), 2019,
+     * 38(6): 1-17.
+     * See details:
+     * https://cs.dartmouth.edu/wjarosz/publications/georgiev19integral.html
+     */
+    EPSeriesCMF,
   };
 
   HeterogeneousMedium(const Properties &props) : Medium(props) {
@@ -218,6 +258,14 @@ class HeterogeneousMedium : public Medium {
       m_method = ESimpsonQuadrature;
     else if (method == "ratiotracking")
       m_method = ERatioTracking;
+    else if (method == "nextflight")
+      m_method = ENextFlight;
+    else if (method == "pseriesratio")
+      m_method = EPSeriesRatio;
+    else if (method == "pseriescumulative")
+      m_method = EPSeriesCumulative;
+    else if (method == "pseriescmf")
+      m_method = EPSeriesCMF;
     else
       Log(EError, "Unsupported integration method \"%s\"!", method.c_str());
   }
@@ -615,7 +663,113 @@ class HeterogeneousMedium : public Medium {
         tr *= (1 - density * m_invMaxDensity);
       }
       return Spectrum(tr);
+    } else if (m_method == ENextFlight) {
+      Float mint, maxt;
+      if (!m_densityAABB.rayIntersect(ray, mint, maxt)) return Spectrum(1.0f);
+      mint = std::max(mint, ray.mint);
+      maxt = std::min(maxt, ray.maxt);
+      Float tr = math::fastexp(-m_maxDensity * (maxt - mint));
+      Float t = mint;
+      // \prod_{j = 1} ^ i \frac{\mu_n(x_j)}{\bar\mu(x_j)}
+      Float pre_mul = 1;
+      for (;;) {
+        t += -math::fastlog(1 - sampler->next1D()) * m_invMaxDensity;
+        if (t >= maxt) break;
+        Point p = ray(t);
+        Float density = lookupDensity(p, ray.d) * m_scale;
+        pre_mul *= (1 - density * m_invMaxDensity);
+        tr += math::fastexp(-m_maxDensity * (maxt - t)) * pre_mul;
+      }
+      return Spectrum(tr);
+    } else if (m_method == EPSeriesRatio) {
+      Float mint, maxt;
+      if (!m_densityAABB.rayIntersect(ray, mint, maxt)) return Spectrum(1.0f);
+      mint = std::max(mint, ray.mint);
+      maxt = std::min(maxt, ray.maxt);
+      Float tau = m_maxDensity * (maxt - mint);
+      // choose k
+      // P(k) = exp(-tau) tau ^ k / k!
+      Float P_k = math::fastexp(-tau);
+      Float sample = sampler->next1D();
+      Float P_k_cdf = P_k;
+      Float tr = 1;
+      for (int i = 1; P_k_cdf < sample; P_k_cdf += P_k, ++i) {
+        Float x = sampler->next1D() * (maxt - mint) + mint;
+        Float density = lookupDensity(ray(x), ray.d) * m_scale;
+        tr *= 1 - density * m_invMaxDensity;
+        P_k *= tau / i;
+      }
+      return Spectrum(tr);
+    } else if (m_method == EPSeriesCumulative) {
+      Float mint, maxt;
+      if (!m_densityAABB.rayIntersect(ray, mint, maxt)) return Spectrum(1.0f);
+      mint = std::max(mint, ray.mint);
+      maxt = std::min(maxt, ray.maxt);
+      double t = 0.0;
+      // use double, W may overflow to inf when using float
+      double W = 1.0;
+      Float rr;
+      do {
+        rr = sampler->next1D();
+      } while (rr == 0.0);
+      Float inv_pdf_unif = maxt - mint;
+      for (int i = 1;; ++i) {
+        t += W;
+        Float x = sampler->next1D() * (maxt - mint) + mint;
+        Float density = lookupDensity(ray(x), ray.d) * m_scale;
+        double wi = (m_maxDensity - density) / i * inv_pdf_unif;
+        Float Pi = std::min(static_cast<Float>(std::abs(W * wi)),
+                            static_cast<Float>(1));
+
+        if (Pi <= rr) break;
+
+        rr /= Pi;
+        W *= (wi / Pi);
+      }
+      return Spectrum(
+          static_cast<Float>(t * math::fastexp(-m_maxDensity * (maxt - mint))));
+    } else if (m_method == EPSeriesCMF) {
+      Float mint, maxt;
+      if (!m_densityAABB.rayIntersect(ray, mint, maxt)) return Spectrum(1.0f);
+      mint = std::max(mint, ray.mint);
+      maxt = std::min(maxt, ray.maxt);
+      Float t = 0.0;
+      Float W = 1.0;
+      int i = 1;
+      Float cdf = 0;
+      Float tau = m_maxDensity * (maxt - mint);
+      Float e_tau = math::fastexp(-tau);
+      Float last_pdf = e_tau;
+      Float rr = 0;
+      do {
+        rr = sampler->next1D();
+      } while (rr == 0);
+      Float inv_pdf_unif = maxt - mint;
+      for (; cdf < 0.99; ++i) {
+        Float x = sampler->next1D() * (maxt - mint) + mint;
+        Float density = lookupDensity(ray(x), ray.d) * m_scale;
+        Float wi = (m_maxDensity - density) / i * inv_pdf_unif;
+        cdf += last_pdf;
+        last_pdf *= tau / i;
+        t += W;
+        W *= wi;
+      }
+      for (;; ++i) {
+        cdf += last_pdf;
+        Float Pi = tau / i;
+        if (Pi <= rr) break;
+        rr /= Pi;
+        Float x = sampler->next1D() * (maxt - mint) + mint;
+        Float density = lookupDensity(ray(x), ray.d) * m_scale;
+        Float wi = (m_maxDensity - density) / i * inv_pdf_unif;
+        t += W;
+        last_pdf *= tau / i;
+        W *= (wi / Pi);
+      }
+      return Spectrum(t * e_tau);
     }
+    Log(EError, "No method for estimating transmittance");
+    return Spectrum(1);
   }
 
   bool sampleDistance(const Ray &ray, MediumSamplingRecord &mRec,

@@ -17,6 +17,10 @@ Modified version of mitsuba renderer target for learning rendering.
 - [openvdbvolume](#openvdbvolume): openvdb volume data source
 - [nanovdbvolume](#nanovdbvolume): nanovdb volume data source
 - [ratiotracking](#ratiotracking): transmittance estimation for heterogeneous medium
+- [nextflight](#nextflight): next flight estimator for transmittance estimation
+- [pseriesratio](#pseriesratio): P-series ratio tracking estimator for transmittance estimation
+- [pseriescumulative](#pseriescumulative): P-series cumulative estimator for transmittance estimation
+- [pseriescmf](#pseriescmf): P-series CMF estimator for transmittance estimation
 
 May implement some recent papers.
 
@@ -66,6 +70,59 @@ Example:
 ```xml
 <medium type="heterogeneous" id="smoke">
   <string name="method" value="ratiotracking"/>
+</medium>
+```
+
+### nextflight
+
+Implemented in file `medium/heterogeneous.cpp`.  
+Novák J, Georgiev I, Hanika J, et al. Monte Carlo methods for volumetric light transport simulation[C]//Computer Graphics Forum. 2018, 37(2).  
+See details: [https://cs.dartmouth.edu/wjarosz/publications/novak18monte.html](https://cs.dartmouth.edu/wjarosz/publications/novak18monte.html)
+
+Example:
+```xml
+<medium type="heterogeneous" id="smoke">
+  <string name="method" value="nextflight"/>
+</medium>
+```
+
+### pseriesratio
+
+Implemented in file `medium/heterogeneous.cpp`.  
+Georgiev I, Misso Z, Hachisuka T, et al. Integral formulations of volumetric transmittance[J]. ACM Transactions on Graphics (TOG), 2019.  
+See details: [https://cs.dartmouth.edu/wjarosz/publications/georgiev19integral.html](https://cs.dartmouth.edu/wjarosz/publications/georgiev19integral.html)
+
+Example:
+```xml
+<medium type="heterogeneous" id="smoke">
+  <string name="method" value="pseriesratio"/>
+</medium>
+```
+
+### pseriescumulative
+
+Implemented in file `medium/heterogeneous.cpp`.  
+Georgiev I, Misso Z, Hachisuka T, et al. Integral formulations of volumetric transmittance[J]. ACM Transactions on Graphics (TOG), 2019.  
+See details: [https://cs.dartmouth.edu/wjarosz/publications/georgiev19integral.html](https://cs.dartmouth.edu/wjarosz/publications/georgiev19integral.html)  
+One note in implementation: use `double` to accumulate `W`, it may become `inf` when grid domain is large when using float.
+
+Example:
+```xml
+<medium type="heterogeneous" id="smoke">
+  <string name="method" value="pseriescumulative"/>
+</medium>
+```
+
+### pseriescmf
+
+Implemented in file `medium/heterogeneous.cpp`.  
+Georgiev I, Misso Z, Hachisuka T, et al. Integral formulations of volumetric transmittance[J]. ACM Transactions on Graphics (TOG), 2019.  
+See details: [https://cs.dartmouth.edu/wjarosz/publications/georgiev19integral.html](https://cs.dartmouth.edu/wjarosz/publications/georgiev19integral.html)  
+
+Example:
+```xml
+<medium type="heterogeneous" id="smoke">
+  <string name="method" value="pseriescmf"/>
 </medium>
 ```
 
