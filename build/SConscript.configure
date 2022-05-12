@@ -1,6 +1,6 @@
 import re, multiprocessing
 
-Import('sys', 'os', 'SCons', 'resources')
+Import('sys', 'os', 'SCons', 'resources', 'conan_flags')
 
 AddOption("--cfg", dest="cfg", type="string", nargs=1, action='store', help='Manually specify a configuration file')
 configFile = GetOption('cfg')
@@ -93,11 +93,11 @@ vars.Add('QTINCLUDE',       'Additional Qt include directory')
 vars.Add('INTEL_COMPILER',  'Should the Intel C++ compiler be used?')
 
 try:
-        env = Environment(options=vars, ENV = os.environ, tools=['default', 'qt5'], toolpath=['#data/scons'])
+        env = Environment(options=vars, ENV = os.environ, tools=['default', 'qt5'], toolpath=['#data/scons'], parse_flags=conan_flags)
         print('Checking for Qt 5.x... yes')
         hasQt = True
 except Exception:
-        env = Environment(options=vars, ENV = os.environ, tools=['default'], toolpath=['#data/scons'])
+        env = Environment(options=vars, ENV = os.environ, tools=['default'], toolpath=['#data/scons'], parse_flags=conan_flags)
         print('Unable to detect a Qt installation -- not building the GUI!')
         hasQt = False
 
@@ -187,13 +187,14 @@ if not conf.CheckCHeader(['stdio.h', 'jpeglib.h']):
 else:
         env.Append(CPPDEFINES = [['MTS_HAS_LIBJPEG', 1]] )
 
-#if not conf.CheckCXXHeader('ImfRgba.h'):
-#        print('OpenEXR is missing (install libopenexr-dev for OpenEXR I/O support)')
-#else:
-#        env.Append(CPPDEFINES = [['MTS_HAS_OPENEXR', 1]] )
+if not conf.CheckCXXHeader('ImfRgba.h'):
+        print('OpenEXR is missing (install libopenexr-dev for OpenEXR I/O support)')
+else:
+        env.Append(CPPDEFINES = [['MTS_HAS_OPENEXR', 1]] )
 # use conan for openexr
 env.Append(CPPDEFINES = [['MTS_HAS_OPENEXR', 1]] )
 
+# use conan for xerces-C++ 3.x
 if not conf.CheckCXXHeader('xercesc/dom/DOMLSParser.hpp'):
         print('Xerces-C++ 3.x must be installed (install libxerces-c-dev)!')
         Exit(1)
@@ -217,19 +218,22 @@ for ver in python_versions:
         env['CPPPATH'][:] = [ x for x in env['CPPPATH'] if x not in includePath ]
 
 # use conan for boost
-#if not conf.CheckCXXHeader('boost/version.hpp'):
-#        print('Boost is missing (install libboost-all-dev)!')
-#        Exit(1)
-#if not conf.TryCompile("#include <boost/version.hpp>\n#if BOOST_VERSION < 104400\n#error Boost is outdated!\n#endif", ".cpp"):
-#        print('Boost is outdated (you will need version 1.44 or newer)!')
-#        Exit(1)
+if not conf.CheckCXXHeader('boost/version.hpp'):
+        print('Boost is missing (install libboost-all-dev)!')
+        Exit(1)
+if not conf.TryCompile("#include <boost/version.hpp>\n#if BOOST_VERSION < 104400\n#error Boost is outdated!\n#endif", ".cpp"):
+        print('Boost is outdated (you will need version 1.44 or newer)!')
+        Exit(1)
+# use conan for Eigen
 if not conf.CheckCXXHeader('Eigen/Core'):
         print('Eigen 3.x is missing (install libeigen3-dev)!')
         Exit(1)
+# use conan for fftw
 if not conf.CheckCXXHeader('fftw3.h'):
-    print('FFTW3 not found (install for fast image convolution support)')
+        print('FFTW3 not found (install for fast image convolution support)')
 else:
         env.Append(CPPDEFINES = [['MTS_HAS_FFTW', 1]] )
+
 if sys.platform == 'win32':
         if not (conf.CheckCHeader(['windows.h', 'GL/gl.h']) \
                         and conf.CheckCHeader(['windows.h', 'GL/glu.h']) \
@@ -239,7 +243,7 @@ if sys.platform == 'win32':
         if not conf.CheckCHeader('GL/glew.h'):
                 print('GLEW headers are missing!')
                 Exit(1)
-elif sys.platform == 'linux2':
+elif sys.platform.startswith('linux'):
         if not (conf.CheckCHeader('GL/gl.h') and conf.CheckCHeader('GL/glu.h') and conf.CheckCHeader(['GL/gl.h', 'GL/glext.h'])):
                 print('OpenGL headers are missing!')
                 Exit(1)
@@ -259,7 +263,7 @@ elif sys.platform == 'darwin':
         if not conf.CheckCHeader('OpenGL/glew.h'):
                 print('GLEW headers are missing!')
                 Exit(1)
-if sys.platform == 'linux2':
+if sys.platform.startswith('linux'):
         if not (conf.CheckCHeader(['X11/Xlib.h', 'X11/extensions/xf86vmode.h'])):
                 print('X Video Mode selection library headers are missing! (Install libxxf86vm-dev)')
                 Exit(1)

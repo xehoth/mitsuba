@@ -7,10 +7,13 @@ import scons_compiledb
 from conans.client.conan_api import ConanAPIV1 as conan_api
 from conans import __version__ as conan_version
 
+# conan
 conan, _, _ = conan_api.factory()
 build_directory = os.path.join(os.getcwd(), "build")
 conanfile_path = os.path.join(os.getcwd(), "conanfile.txt")
 conan.install(conanfile_path, generators=["scons"], install_folder=build_directory)
+conan_flags = SConscript('{}/SConscript_conan'.format(build_directory))
+conan_flags = conan_flags["conan"]
 
 resources = []
 plugins = []
@@ -18,17 +21,12 @@ stubs = []
 winstubs = []
 
 Export('SCons', 'sys', 'os', 'glob', 'resources',
-        'plugins', 'stubs', 'winstubs')
+        'plugins', 'stubs', 'winstubs', 'conan_flags')
 
 # Configure the build framework
 env = SConscript('build/SConscript.configure')
 config = scons_compiledb.Config(db='build/compile_commands.json')
 scons_compiledb.enable(env, config)
-
-# conan
-conan_flags = SConscript('{}/SConscript_conan'.format(build_directory))
-flags = conan_flags["conan"]
-env.MergeFlags(flags)
 
 Export('env')
 

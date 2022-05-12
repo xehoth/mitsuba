@@ -10,8 +10,7 @@ Modified version of mitsuba renderer target for learning rendering.
 - Add support for package manager [conan](https://conan.io/)
 - Fix compilation with C++ 17
 - Fix overflow in render setting UI (only happens in release mode)
-- OpenEXR has been changed to 2.5.5 with conan.
-- Boost has been changed to 1.79.0 with conan.
+- Use conan for most dependencies: OpenEXR 2.5.5, Boost 1.79.0, Eigen 3.4.0, fftw 3.3.9, xerces-c 3.2.3, libpng 1.6.37, libjpeg 9d
 
 ## New Plugins
 

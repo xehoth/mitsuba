@@ -1,8 +1,16 @@
 [requires]
 boost/1.79.0
+eigen/3.4.0
 zlib/1.2.12
 openexr/2.5.5
 openvdb/8.0.1
+fftw/3.3.9
+xerces-c/3.2.3
+libpng/1.6.37
+libjpeg/9d
+
+[options]
+fftw:threads=True
 
 [generators]
 scons
