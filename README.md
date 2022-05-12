@@ -21,7 +21,7 @@ Modified version of mitsuba renderer target for learning rendering.
 - [pseriesratio](#pseriesratio): P-series ratio tracking estimator for transmittance estimation
 - [pseriescumulative](#pseriescumulative): P-series cumulative estimator for transmittance estimation
 - [pseriescmf](#pseriescmf): P-series CMF estimator for transmittance estimation
-- [multipass_volpath](#multipassvolpath): modified `volpath` integrator that supports multiple passes
+- [multipass_volpath](#multipass_volpath): modified `volpath` integrator that supports multiple passes
 
 May implement some recent papers.
 
