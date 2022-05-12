@@ -216,12 +216,13 @@ for ver in python_versions:
                 print('Python ' + ver + ' is missing: not building wrappers')
         env['CPPPATH'][:] = [ x for x in env['CPPPATH'] if x not in includePath ]
 
-if not conf.CheckCXXHeader('boost/version.hpp'):
-        print('Boost is missing (install libboost-all-dev)!')
-        Exit(1)
-if not conf.TryCompile("#include <boost/version.hpp>\n#if BOOST_VERSION < 104400\n#error Boost is outdated!\n#endif", ".cpp"):
-        print('Boost is outdated (you will need version 1.44 or newer)!')
-        Exit(1)
+# use conan for boost
+#if not conf.CheckCXXHeader('boost/version.hpp'):
+#        print('Boost is missing (install libboost-all-dev)!')
+#        Exit(1)
+#if not conf.TryCompile("#include <boost/version.hpp>\n#if BOOST_VERSION < 104400\n#error Boost is outdated!\n#endif", ".cpp"):
+#        print('Boost is outdated (you will need version 1.44 or newer)!')
+#        Exit(1)
 if not conf.CheckCXXHeader('Eigen/Core'):
         print('Eigen 3.x is missing (install libeigen3-dev)!')
         Exit(1)
