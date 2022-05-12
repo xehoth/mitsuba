@@ -10,7 +10,7 @@ Modified version of mitsuba renderer target for learning rendering.
 - Add support for package manager [conan](https://conan.io/)
 - Fix compilation with C++ 17
 - Fix overflow in render setting UI (only happens in release mode)
-- OpenEXR has been change to 2.5.5 with conan.
+- OpenEXR has been changed to 2.5.5 with conan.
 
 ## New Plugins
 
@@ -21,6 +21,7 @@ Modified version of mitsuba renderer target for learning rendering.
 - [pseriesratio](#pseriesratio): P-series ratio tracking estimator for transmittance estimation
 - [pseriescumulative](#pseriescumulative): P-series cumulative estimator for transmittance estimation
 - [pseriescmf](#pseriescmf): P-series CMF estimator for transmittance estimation
+- [multipass_volpath](#multipassvolpath): modified `volpath` integrator that supports multiple passes
 
 May implement some recent papers.
 
@@ -124,6 +125,22 @@ Example:
 <medium type="heterogeneous" id="smoke">
   <string name="method" value="pseriescmf"/>
 </medium>
+```
+
+### multipass_volpath
+
+Implemented in file `integrators/path/multipass_volpath.cpp`.  
+Modify the `volpath` integrator to support multiple passes. More interactive and a try because some other integrators may some operations between different pass.  
+
+- `sppPerPass`: the spp for each pass, the pass count will be calculated automatically according to total sample count. Do **not** use with `passCount`.
+- `passCount`: the total pass count, spp per pass will be calculated automatically according to total sample count. Do **not** use with `sppPerPass`.
+
+Example:
+```xml
+<integrator type="multipass_volpath">
+  <integer name="maxDepth" value="8"/>
+  <integer name="sppPerPass" value="4"/>
+</integrator>
 ```
 
 ## Dockerfile
