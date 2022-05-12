@@ -11,6 +11,7 @@ Modified version of mitsuba renderer target for learning rendering.
 - Fix compilation with C++ 17
 - Fix overflow in render setting UI (only happens in release mode)
 - OpenEXR has been changed to 2.5.5 with conan.
+- Boost has been changed to 1.79.0 with conan.
 
 ## New Plugins
 

@@ -1,4 +1,5 @@
 [requires]
+boost/1.79.0
 zlib/1.2.12
 openexr/2.5.5
 openvdb/8.0.1
