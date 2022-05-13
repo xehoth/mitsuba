@@ -117,8 +117,8 @@ class OpenvdbDataSource : public VolumeDataSource {
     auto b_max = bounding_box.max();
     Log(EDebug, "local bounding box: (%f, %f, %f) x (%f, %f, %f)", b_min.x(),
         b_min.y(), b_min.z(), b_max.x(), b_max.y(), b_max.z());
-    Point p_min(b_min.x(), b_min.y(), b_min.z());
-    Point p_max(b_max.x(), b_max.y(), b_max.z());
+    Point p_min(static_cast<Float>(b_min.x()), static_cast<Float>(b_min.y()), static_cast<Float>(b_min.z()));
+    Point p_max(static_cast<Float>(b_max.x()), static_cast<Float>(b_max.y()), static_cast<Float>(b_max.z()));
     p_min = m_volumeToWorld(p_min);
     p_max = m_volumeToWorld(p_max);
     m_aabb.reset();
