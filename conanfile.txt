@@ -8,9 +8,12 @@ fftw/3.3.9
 xerces-c/3.2.3
 libpng/1.6.37
 libjpeg/9d
+qt/5.15.4
 
 [options]
 fftw:threads=True
+qt:shared=True
+qt:qtxmlpatterns=True
 
 [generators]
 scons

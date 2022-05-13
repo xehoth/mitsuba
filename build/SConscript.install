@@ -53,6 +53,14 @@ if 'linux' in sys.platform:
         install(distDir, ['mitsuba/mitsuba', 'mitsuba/mtssrv', 'mitsuba/mtsutil'])
         if hasQt:
                 install(distDir, ['mtsgui/mtsgui'])
+                try:
+                        if env['USE_CONAN_QT']:
+                                qt_plugins_dir = os.path.join(env['QTDIR'], 'bin/archdatadir/plugins')
+                                for file in os.listdir(qt_plugins_dir):
+                                        installTargets += env.Install(distDir, os.path.join(qt_plugins_dir, file))
+                except:
+                        pass
+
         if hasCollada:
                 install(distDir, ['converter/mtsimport'])
 if sys.platform == 'win32':

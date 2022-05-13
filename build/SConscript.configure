@@ -93,14 +93,14 @@ vars.Add('QTINCLUDE',       'Additional Qt include directory')
 vars.Add('INTEL_COMPILER',  'Should the Intel C++ compiler be used?')
 
 try:
-        env = Environment(options=vars, ENV = os.environ, tools=['default', 'qt5'], toolpath=['#data/scons'], parse_flags=conan_flags)
+        env = Environment(options=vars, ENV = os.environ, tools=['default', 'qt5'], toolpath=['#data/scons'], parse_flags=conan_flags, CONAN_FLAGS=conan_flags)
         print('Checking for Qt 5.x... yes')
         hasQt = True
 except Exception:
-        env = Environment(options=vars, ENV = os.environ, tools=['default'], toolpath=['#data/scons'], parse_flags=conan_flags)
+        env = Environment(options=vars, ENV = os.environ, tools=['default'], toolpath=['#data/scons'], parse_flags=conan_flags, CONAN_FLAGS=conan_flags)
         print('Unable to detect a Qt installation -- not building the GUI!')
         hasQt = False
-
+        
 hasCollada=True
 hasPython = []
 

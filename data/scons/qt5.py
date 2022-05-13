@@ -44,7 +44,7 @@ import SCons.Scanner
 import SCons.Tool
 import SCons.Util
 
-class ToolQtWarning(SCons.Warnings.Warning):
+class ToolQtWarning(SCons.Warnings.SConsWarning):
         pass
 
 class GeneratedMocFileNotIncluded(ToolQtWarning):
@@ -201,6 +201,13 @@ def _detect(env):
 
         try: return os.environ['QTDIR']
         except KeyError: pass
+        # conan qt
+        for i in env['CONAN_FLAGS']['CPPPATH']:
+                find_str = 'include/QtCore'
+                s = i.replace('\\', '/')
+                if s.find(find_str) != -1:
+                        env['USE_CONAN_QT'] = True
+                        return s[:-len(find_str)].rstrip('/') 
 
         moc = env.WhereIs('moc-qt5') or env.WhereIs('moc5') or env.WhereIs('moc')
         if moc:
@@ -431,6 +438,13 @@ def enable_modules(self, modules, debug=False, crosscompiling=False) :
         for module in modules :
                 try : self.AppendUnique(CPPDEFINES=moduleDefines[module])
                 except: pass
+        try:
+                if env['USE_CONAN_QT']:
+                        self["QT5_MOCCPPPATH"] = self["CPPPATH"]
+                        return
+        except:
+                pass
+
         debugSuffix = ''
         if (sys.platform=='darwin' or sys.platform.startswith('linux')) and not crosscompiling :
                 if debug : debugSuffix = '_debug'
