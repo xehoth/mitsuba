@@ -56,3 +56,4 @@ build/conan*
 build/graph_info.json
 build/SConscript_conan
 scenes
+data/windows/wmain_stub.obj

@@ -23,7 +23,7 @@ if not os.path.exists(configFile):
         print('\nA configuration file must be selected! Have a look at http://www.mitsuba-renderer.org/docs.html')
         Exit(1)
 
-needsBuildDependencies = (sys.platform == 'win32' or sys.platform == 'darwin')
+needsBuildDependencies = sys.platform == 'darwin' #(sys.platform == 'win32' or sys.platform == 'darwin')
 
 if needsBuildDependencies and not os.path.exists(GetBuildPath('#dependencies')):
         print('\nThe required build dependency files are missing. Please see the documentation')
@@ -236,8 +236,8 @@ else:
 
 if sys.platform == 'win32':
         if not (conf.CheckCHeader(['windows.h', 'GL/gl.h']) \
-                        and conf.CheckCHeader(['windows.h', 'GL/glu.h']) \
-                        and conf.CheckCHeader(['windows.h', 'GL/gl.h', 'GL/glext.h'])):
+                        and conf.CheckCHeader(['windows.h', 'GL/glu.h'])):
+                        # and conf.CheckCHeader(['windows.h', 'GL/gl.h', 'GL/glext.h'])):
                 print('OpenGL headers are missing!')
                 Exit(1)
         if not conf.CheckCHeader('GL/glew.h'):

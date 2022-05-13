@@ -15,6 +15,7 @@ qt/5.15.4
 fftw:threads=True
 qt:shared=True
 qt:qtxmlpatterns=True
+xerces-c:shared=True
 
 [generators]
 scons

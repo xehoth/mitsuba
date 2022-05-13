@@ -28,12 +28,18 @@ if hasQt:
         qtEnv.EnableQt5Modules(['QtGui', 'QtWidgets', 'QtCore', 'QtOpenGL', 'QtXml', 'QtXmlPatterns', 'QtNetwork'])
 
         if sys.platform == 'win32':
-                index = qtEnv['CXXFLAGS'].index('_CONSOLE')
-                del qtEnv['CXXFLAGS'][index-1]
-                del qtEnv['CXXFLAGS'][index-1]
-                index = qtEnv['LINKFLAGS'].index('/SUBSYSTEM:CONSOLE')
-                del qtEnv['LINKFLAGS'][index]
-                qtEnv.Append(CXXFLAGS=['/D', '_WINDOWS', '/D', 'MTS_CUSTOM_QTMAIN', '/D', 'MTSGUI_STATIC_QFILEDIALOG=1'])
+                try:
+                        index = qtEnv['CXXFLAGS'].index('_CONSOLE')
+                        del qtEnv['CXXFLAGS'][index-1]
+                        del qtEnv['CXXFLAGS'][index-1]
+                except:
+                        pass
+                try:
+                        index = qtEnv['LINKFLAGS'].index('/SUBSYSTEM:CONSOLE')
+                        del qtEnv['LINKFLAGS'][index]
+                except:
+                        pass
+                qtEnv.Append(CXXFLAGS=['/D_WINDOWS', '/DMTS_CUSTOM_QTMAIN', '/DMTSGUI_STATIC_QFILEDIALOG=1'])
                 qtEnv.Append(LINKFLAGS=['/SUBSYSTEM:WINDOWS'])
                 qtEnv.Append(LIBS=['qtmain', 'shell32'])
         elif sys.platform == 'darwin':

@@ -2,7 +2,6 @@ import SCons
 import sys
 import glob
 import os
-import scons_compiledb
 
 from conans.client.conan_api import ConanAPIV1 as conan_api
 from conans import __version__ as conan_version
@@ -25,8 +24,8 @@ Export('SCons', 'sys', 'os', 'glob', 'resources',
 
 # Configure the build framework
 env = SConscript('build/SConscript.configure')
-config = scons_compiledb.Config(db='build/compile_commands.json')
-scons_compiledb.enable(env, config)
+env.Tool('compilation_db')
+env.CompilationDatabase('build/compile_commands.json')
 
 Export('env')
 
@@ -106,5 +105,3 @@ build('src/tests/SConscript')
 
 # ===== Move everything to its proper place =====
 SConscript('build/SConscript.install')
-
-env.CompileDb()

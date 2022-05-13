@@ -8,9 +8,28 @@ Modified version of mitsuba renderer target for learning rendering.
 - Use python 3.x and scons 4.x for compiling.
 - Generate compile commands with [scons-compiledb](https://pypi.org/project/scons-compiledb/). Thus we can use clangd for intellisense.
 - Add support for package manager [conan](https://conan.io/)
-- Fix compilation with C++ 20
+- Fix compilation with C++ 17
 - Fix overflow in render setting UI (only happens in release mode)
 - Use conan for most dependencies: OpenEXR 2.5.5, Boost 1.79.0, Eigen 3.4.0, fftw 3.3.9, xerces-c 3.2.3, libpng 1.6.37, libjpeg 9d, glew 2.2.0, QT 5.15.4
+
+## Compile
+
+### Windows
+
+Known problems:
+- For dependency `xerces-c`, when building with VS2022. Modify the `C:/Users/xxx/.conan/data/xerces-c/xxx/source/source_subfolder/cmake/XercesFunctions.cmake`: add `include(CheckSymbolExists)` and replace the `check_function_exists(gettimeofday HAVE_GETTIMEOFDAY)` with `check_symbol_exists(gettimeofday sys/time.h HAVE_GETTIMEOFDAY)`.
+
+```shell
+cp build/config-win64-msvc2022.py config.py
+cd build
+$env:CONAN_REVISIONS_ENABLED=1; $env:CONAN_SYSREQUIRES_MODE='enabled'; conan install .. --build=missing
+cd ..
+scons -j 16
+```
+
+### Linux
+
+Refer to the [dockerfile](Dockerfile).
 
 ## New Plugins
 
