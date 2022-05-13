@@ -37,7 +37,9 @@
     #define _CRT_SECURE_NO_DEPRECATE
 
     #define _WIN32_WINNT 0x0501 // Windows XP
+    #if !defined(NOMINMAX)
     #define NOMINMAX
+    #endif
     #define WIN32_LEAN_AND_MEAN
 
     #pragma warning(disable : 4251) // 'field' : class 'A' needs to have dll-interface to be used by clients of class 'B'
@@ -212,8 +214,8 @@ MTS_NAMESPACE_END
 
 #include <float.h>
 
-#define snprintf _snprintf
-#define vsnprintf _vsnprintf
+// #define snprintf _snprintf
+// #define vsnprintf _vsnprintf
 
 namespace mitsuba {
 #if defined(__64BIT__)
