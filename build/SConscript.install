@@ -88,18 +88,28 @@ if sys.platform == 'win32':
                         [ ('#' + os.path.join(includeDir, fname)) for fname in entry[2] ])
         for ver in hasPython:
                 installAs(os.path.join(distDir, 'python/'+ver+'/mitsuba.pyd'), 'libpython/mitsuba_python' + ver + '.dll')
-        install(distDir, ['Iex.dll', 'Half.dll','IlmThread.dll', 'Imath.dll','IlmImf.dll','zlib1.dll',
-                'libpng16.dll', 'jpeg.dll', 'xerces-c_3_1.dll', 'glew32mx.dll', 'libfftw3-3.dll'],
-                prefix=dllprefix)
-        for boostlib in ['python27', 'python35', 'python36', 'system', 'filesystem', 'chrono', 'thread']:
-                install(distDir, ['boost_%s-%s-mt-1_64.dll' % (boostlib, compilerType)], dllprefix)
+        # install(distDir, ['Iex.dll', 'Half.dll','IlmThread.dll', 'Imath.dll','IlmImf.dll','zlib1.dll',
+        #         'libpng16.dll', 'jpeg.dll', 'xerces-c_3_1.dll', 'glew32mx.dll', 'libfftw3-3.dll'],
+        #         prefix=dllprefix)
+        # for boostlib in ['python27', 'python35', 'python36', 'system', 'filesystem', 'chrono', 'thread']:
+        #         install(distDir, ['boost_%s-%s-mt-1_64.dll' % (boostlib, compilerType)], dllprefix)
 
         installTargets += env.Install(distDir, '#data/windows/README.txt')
 
         if hasQt:
                 install(distDir, ['mtsgui/mtsgui.exe'])
-                install(distDir, ['Qt5Core.dll', 'Qt5Gui.dll', 'Qt5Widgets.dll', 'Qt5Xml.dll',
-                        'Qt5Network.dll', 'Qt5OpenGL.dll', 'Qt5XmlPatterns.dll'], prefix = env['QT5_LIBPATH'])
+                conan_qt = False
+                try:
+                        if env['USE_CONAN_QT']:
+                                qt_plugins_dir = os.path.join(env['QTDIR'], 'bin/archdatadir/plugins')
+                                conan_qt = True
+                                for file in os.listdir(qt_plugins_dir):
+                                        installTargets += env.Install(distDir, os.path.join(qt_plugins_dir, file))
+                except:
+                        pass
+                if not conan_qt:
+                        install(distDir, ['Qt5Core.dll', 'Qt5Gui.dll', 'Qt5Widgets.dll', 'Qt5Xml.dll',
+                                'Qt5Network.dll', 'Qt5OpenGL.dll', 'Qt5XmlPatterns.dll'], prefix = env['QT5_LIBPATH'])
 elif sys.platform == 'darwin':
         for i in plugins:
                 plugin = env.Install(os.path.join(distDir, 'plugins'), i)

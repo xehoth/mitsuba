@@ -1,11 +1,11 @@
-FROM ubuntu:20.04
+FROM ubuntu:latest
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Shanghai
 WORKDIR /home/mitsuba
 COPY . /home/mitsuba
 
-RUN apt update -y && apt upgrade -y && apt install -y build-essential pkg-config apt-utils python3 python3-pip cmake libxxf86vm-dev libpcrecpp0v5 libglu1-mesa-dev mesa-common-dev git vim curl sudo \
+RUN apt update -y && apt upgrade -y && apt install -y build-essential pkg-config apt-utils python3 python3-pip cmake libxxf86vm-dev libpcrecpp0v5 libgl1-mesa-dev libglu1-mesa-dev mesa-common-dev git vim curl sudo \
     && pip3 install scons-compiledb conan SCons \
     && conan profile new default --detect \
     && conan profile update settings.compiler.libcxx=libstdc++11 default \
