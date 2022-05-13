@@ -440,7 +440,7 @@ def enable_modules(self, modules, debug=False, crosscompiling=False) :
                 try : self.AppendUnique(CPPDEFINES=moduleDefines[module])
                 except: pass
         try:
-                if env['USE_CONAN_QT']:
+                if self['USE_CONAN_QT']:
                         self["QT5_MOCCPPPATH"] = self["CPPPATH"]
                         return
         except:
