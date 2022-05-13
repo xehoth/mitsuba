@@ -207,6 +207,7 @@ def _detect(env):
                 s = i.replace('\\', '/')
                 if s.find(find_str) != -1:
                         env['USE_CONAN_QT'] = True
+                        print("use conan for QT")
                         return s[:-len(find_str)].rstrip('/') 
 
         moc = env.WhereIs('moc-qt5') or env.WhereIs('moc5') or env.WhereIs('moc')

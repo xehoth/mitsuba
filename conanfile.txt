@@ -8,6 +8,8 @@ fftw/3.3.9
 xerces-c/3.2.3
 libpng/1.6.37
 libjpeg/9d
+glew/2.2.0
+freeglut/3.2.1
 qt/5.15.4
 
 [options]
