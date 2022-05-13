@@ -99,7 +99,7 @@ void SceneLoader::run() {
             parser->setDoSchema(true);
             parser->setValidationSchemaFullChecking(true);
             parser->setValidationScheme(SAXParser::Val_Always);
-            parser->setExternalNoNamespaceSchemaLocation(schemaPath.c_str());
+            parser->setExternalNoNamespaceSchemaLocation((const XMLCh *)schemaPath.c_str());
 
             /* Set the SAX handler */
             parser->setDoNamespaces(true);
@@ -118,7 +118,7 @@ void SceneLoader::run() {
                     filename.string().c_str());
 
             try {
-                parser->parse(filename.c_str());
+                parser->parse((const XMLCh *)filename.c_str());
             } catch (const VersionException &ex) {
                 m_versionError = true;
                 m_version = ex.getVersion();
