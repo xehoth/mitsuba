@@ -39,7 +39,7 @@ Quickly build with [docker](https://www.docker.com/). And the compile process ca
 
 ### Run with WSLg
 
-You can forward X11 to suppuort `mtsgui`.
+You can forward X11 to support `mtsgui`.
 
 ```shell
 docker build -t xxx/mitsuba .

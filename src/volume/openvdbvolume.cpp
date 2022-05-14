@@ -71,7 +71,9 @@ class OpenvdbDataSource : public VolumeDataSource {
       const openvdb::math::Vec3d &voxelSize =
           m_grid->constTransform().voxelSize();
       m_customStepSize =
-          std::min(std::min(voxelSize.x(), voxelSize.y()), voxelSize.z()) * 0.5;
+          static_cast<Float>(
+              std::min(std::min(voxelSize.x(), voxelSize.y()), voxelSize.z())) *
+          static_cast<Float>(0.5);
       Log(EDebug, "step size set to: %f", m_customStepSize);
     }
   }
@@ -99,7 +101,7 @@ class OpenvdbDataSource : public VolumeDataSource {
     openvdb::math::Mat4d g_mat =
         m_grid->transform().baseMap()->getAffineMap()->getMat4();
     for (int i = 0; i < 4; ++i)
-      for (int j = 0; j < 4; ++j) mat(i, j) = g_mat(i, j);
+      for (int j = 0; j < 4; ++j) mat(i, j) = static_cast<Float>(g_mat(i, j));
 
     m_grid->setTransform(openvdb::math::Transform::createLinearTransform(
         openvdb::math::Mat4d::identity()));
@@ -117,8 +119,10 @@ class OpenvdbDataSource : public VolumeDataSource {
     auto b_max = bounding_box.max();
     Log(EDebug, "local bounding box: (%f, %f, %f) x (%f, %f, %f)", b_min.x(),
         b_min.y(), b_min.z(), b_max.x(), b_max.y(), b_max.z());
-    Point p_min(static_cast<Float>(b_min.x()), static_cast<Float>(b_min.y()), static_cast<Float>(b_min.z()));
-    Point p_max(static_cast<Float>(b_max.x()), static_cast<Float>(b_max.y()), static_cast<Float>(b_max.z()));
+    Point p_min(static_cast<Float>(b_min.x()), static_cast<Float>(b_min.y()),
+                static_cast<Float>(b_min.z()));
+    Point p_max(static_cast<Float>(b_max.x()), static_cast<Float>(b_max.y()),
+                static_cast<Float>(b_max.z()));
     p_min = m_volumeToWorld(p_min);
     p_max = m_volumeToWorld(p_max);
     m_aabb.reset();
