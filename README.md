@@ -5,24 +5,26 @@ Modified version of mitsuba renderer target for learning rendering.
 
 ## Changes
 
-- Use python 3.x and scons 4.x for compiling.
-- Generate compile commands with [scons-compiledb](https://pypi.org/project/scons-compiledb/). Thus we can use clangd for intellisense.
-- Add support for package manager [conan](https://conan.io/)
+- Use [python 3.x](https://www.python.org/) and [SCons 4.x](https://scons.org/) for compiling.
+- Generate compile commands with SCons 4.x, we can use [clangd](https://clangd.llvm.org/) for intellisense.
+- Add support for package manager [Conan](https://conan.io/)
 - Fix compilation with C++ 17
 - Fix overflow in render setting UI (only happens in release mode)
-- Use conan for most dependencies: OpenEXR 2.5.5, Boost 1.79.0, Eigen 3.4.0, fftw 3.3.9, xerces-c 3.2.3, libpng 1.6.37, libjpeg 9d, glew 2.2.0, QT 5.15.4
+- Use Conan for most dependencies: OpenEXR 2.5.5, Boost 1.79.0, Eigen 3.4.0, fftw 3.3.9, xerces-c 3.2.3, libpng 1.6.37, libjpeg 9d, glew 2.2.0, QT 5.15.4
 
 ## Compile
 
 ### Windows
 
-Known problems:
-- For dependency `xerces-c`, when building with VS2022. Modify the `C:/Users/xxx/.conan/data/xerces-c/xxx/source/source_subfolder/cmake/XercesFunctions.cmake`: add `include(CheckSymbolExists)` and replace the `check_function_exists(gettimeofday HAVE_GETTIMEOFDAY)` with `check_symbol_exists(gettimeofday sys/time.h HAVE_GETTIMEOFDAY)`.
+~~Known problems:~~
+- ~~For dependency `xerces-c`, when building with VS2022. Modify the `C:/Users/xxx/.conan/data/xerces-c/xxx/source/source_subfolder/cmake/XercesFunctions.cmake`: add `include(CheckSymbolExists)` and replace the `check_function_exists(gettimeofday HAVE_GETTIMEOFDAY)` with `check_symbol_exists(gettimeofday sys/time.h HAVE_GETTIMEOFDAY)`.~~ Solved by using `Ninja` as the cmake generator.
+
+First open the developer powershell for VS 2022 with x64 as the host architecture, then run
 
 ```shell
 cp build/config-win64-msvc2022.py config.py
 cd build
-$env:CONAN_REVISIONS_ENABLED=1; $env:CONAN_SYSREQUIRES_MODE='enabled'; conan install .. --build=missing
+$env:CONAN_CMAKE_GENERATOR='Ninja'; $env:CONAN_REVISIONS_ENABLED=1; $env:CONAN_SYSREQUIRES_MODE='enabled'; conan install .. --build=missing
 cd ..
 scons -j 16
 ```
@@ -30,6 +32,19 @@ scons -j 16
 ### Linux
 
 Refer to the [dockerfile](Dockerfile).
+
+## Dockerfile
+
+Quickly build with [docker](https://www.docker.com/). And the compile process can refer to the [dockerfile](Dockerfile).
+
+### Run with WSLg
+
+You can forward X11 to suppuort `mtsgui`.
+
+```shell
+docker build -t xxx/mitsuba .
+docker run -it --name "mitsuba" --network host --gpus=all -v /tmp/.X11-unix/:/tmp/.X11-unix -e DISPLAY xxx/mitsuba /bin/bash
+```
 
 ## New Plugins
 
@@ -161,10 +176,6 @@ Example:
   <integer name="sppPerPass" value="4"/>
 </integrator>
 ```
-
-## Dockerfile
-
-Quickly build with docker. And the compile process can refer to this.
 
 # Mitsuba — Physically Based Renderer
 
