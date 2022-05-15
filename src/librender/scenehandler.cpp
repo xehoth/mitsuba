@@ -664,7 +664,7 @@ void SceneHandler::endElement(const XMLCh* const xmlName) {
                 parser->setDoSchema(true);
                 parser->setValidationSchemaFullChecking(true);
                 parser->setValidationScheme(SAXParser::Val_Always);
-                parser->setExternalNoNamespaceSchemaLocation((const XMLCh *)schemaPath.c_str());
+                parser->setExternalNoNamespaceSchemaLocation(reinterpret_cast<std::conditional_t<std::is_same_v<boost::filesystem::path::value_type, wchar_t>, const XMLCh *, const char *>>(schemaPath.c_str()));
 
                 /* Set the handler and start parsing */
                 SceneHandler *handler = new SceneHandler(m_params, m_namedObjects, true);
@@ -673,7 +673,7 @@ void SceneHandler::endElement(const XMLCh* const xmlName) {
                 parser->setErrorHandler(handler);
                 fs::path path = resolver->resolve(context.attributes["filename"]);
                 XMLLog(EInfo, "Parsing included file \"%s\" ..", path.filename().string().c_str());
-                parser->parse((const XMLCh *)path.c_str());
+                parser->parse(reinterpret_cast<std::conditional_t<std::is_same_v<boost::filesystem::path::value_type, wchar_t>, const XMLCh *, const char *>>(path.c_str()));
 
                 object = handler->getScene();
                 delete parser;
@@ -832,14 +832,14 @@ ref<Scene> SceneHandler::loadScene(const fs::path &filename, const ParameterMap 
     parser->setDoSchema(true);
     parser->setValidationSchemaFullChecking(true);
     parser->setValidationScheme(SAXParser::Val_Always);
-    parser->setExternalNoNamespaceSchemaLocation((const XMLCh *)schemaPath.c_str());
+    parser->setExternalNoNamespaceSchemaLocation(reinterpret_cast<std::conditional_t<std::is_same_v<boost::filesystem::path::value_type, wchar_t>, const XMLCh *, const char *>>(schemaPath.c_str()));
 
     SceneHandler *handler = new SceneHandler(params);
     parser->setDoNamespaces(true);
     parser->setDocumentHandler(handler);
     parser->setErrorHandler(handler);
 
-    parser->parse((const XMLCh *)filename.c_str());
+    parser->parse(reinterpret_cast<std::conditional_t<std::is_same_v<boost::filesystem::path::value_type, wchar_t>, const XMLCh *, const char *>>(filename.c_str()));
     ref<Scene> scene = handler->getScene();
 
     delete parser;
@@ -858,7 +858,7 @@ ref<Scene> SceneHandler::loadSceneFromString(const std::string &content, const P
     parser->setDoSchema(true);
     parser->setValidationSchemaFullChecking(true);
     parser->setValidationScheme(SAXParser::Val_Always);
-    parser->setExternalNoNamespaceSchemaLocation((const XMLCh *)schemaPath.c_str());
+    parser->setExternalNoNamespaceSchemaLocation(reinterpret_cast<std::conditional_t<std::is_same_v<boost::filesystem::path::value_type, wchar_t>, const XMLCh *, const char *>>(schemaPath.c_str()));
 
     SceneHandler *handler = new SceneHandler(params);
     parser->setDoNamespaces(true);
